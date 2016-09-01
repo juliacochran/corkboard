@@ -1,14 +1,24 @@
-import { registerCard, registerNamespace, run } from './init';
+import { registerCard, registerNamespace } from './init';
+import defcard from './lib/defcard';
 
-export function doc(str) {
+export { registerNamespace as ns };
+
+export function card(...args) {
+  registerCard(defcard(...args));
+}
+
+export function md(str) {
   return {
     isDoc: true,
     text: str.join('\n'),
   };
 }
 
-export {
-  registerCard as card,
-  registerNamespace as ns,
-  run,
-};
+export function doc(str) {
+  console.log('`doc` is deprecated. Please use `md` instead');
+  return md(str);
+}
+
+export function text(documentation) {
+  card(null, md([documentation]), null, {}, { heading: false });
+}
