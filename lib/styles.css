@@ -123,5 +123,6 @@ table tr code {
 
 .gray { color: #999; }
 .black { color: #333; }
-.blue-hover:hover { color: #4A90E2; }
 
+.blue { color: #4A90E2; }
+.blue-hover:hover { color: #4A90E2; }
