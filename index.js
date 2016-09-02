@@ -1,7 +1,10 @@
 import { registerCard, registerNamespace } from './init';
 import defcard from './lib/defcard';
 
-export { registerNamespace as ns };
+export {
+  registerNamespace as ns,
+  registerCard,
+};
 
 export function card(...args) {
   registerCard(defcard(...args));
