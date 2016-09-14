@@ -1,5 +1,7 @@
 import { registerCard, registerNamespace } from './init';
 import defcard from './lib/defcard';
+import React from 'react';
+import Markdown from './lib/components/Markdown';
 
 export {
   registerNamespace as ns,
@@ -7,14 +9,11 @@ export {
 };
 
 export function card(...args) {
-  registerCard(defcard(...args));
+  registerCard((id) => defcard(id, ...args));
 }
 
 export function md(str) {
-  return {
-    isDoc: true,
-    text: str.join('\n'),
-  };
+  return <Markdown text={typeof str === 'string' ? str : str.join('\n')} />;
 }
 
 export function doc(str) {
