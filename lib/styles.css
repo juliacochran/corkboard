@@ -20,3 +20,28 @@ code {
 }
 
 .no-underline { text-decoration: none; }
+
+
+@media (max-width: 360px) {
+  .xs-hide {
+    display: none;
+  }
+}
+
+@media (min-width: 360px) and (max-width: 800px) {
+  .sm-hide {
+    display: none;
+  }
+}
+
+@media (min-width: 800px) and (max-width: 1312px) {
+  .md-hide {
+    display: none;
+  }
+}
+
+@media (min-width: 1312px) {
+  .lg-hide {
+    display: none;
+  }
+}
