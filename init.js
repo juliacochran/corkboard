@@ -1,32 +1,68 @@
 /* eslint-env browser */
-let CURRENT_NAMESPACE;
-const CARDS = [];
 
-export function registerNamespace(namespace) {
-  CURRENT_NAMESPACE = namespace;
-  CARDS[CURRENT_NAMESPACE] = [];
+const MENU = [];
+let currentNamespace = null;
+let currentType = null;
+let currentMenuTitle;
+const NS_TO_MENU_MAP = []; /* Keeps a basic mapping of namespace to menu title for easy retrieval */
+
+function menuItem(type, children = []) {
+  return ({
+    type,
+    children,
+  });
+}
+
+export function registerGroup(groupName, renderPages) {
+  currentMenuTitle = groupName;
+  currentType = 'group';
+  MENU[currentMenuTitle] = menuItem(currentType);
+  renderPages();
+  currentType = null;
+}
+
+export function registerNamespace(ns) {
+  // namespace already exists
+  if (currentType === 'group' && ns in MENU) {
+    throw new Error('You must have unqiue group names and namespaces');
+  }
+
+  // page without a group
+  if (!currentType) {
+    currentMenuTitle = ns;
+    currentType = 'page';
+    MENU[currentMenuTitle] = menuItem(currentType);
+  }
+  currentNamespace = ns;
+  MENU[currentMenuTitle].children[currentNamespace] = [];
+
+  NS_TO_MENU_MAP[currentNamespace] = currentMenuTitle;
 }
 
 export function registerCard(cardOrFunction) {
-  if (!CURRENT_NAMESPACE) {
-    throw new Error('No namespace defined');
+  if (!currentMenuTitle) {
+    throw new Error('No namespace or group defined');
   }
 
   let card = cardOrFunction;
-  const nsId = CURRENT_NAMESPACE.replace(/\W/g, '-').toLowerCase();
-  const id = `${nsId}-${CARDS[CURRENT_NAMESPACE].length}`;
+  const nsId = currentNamespace.replace(/\W/g, '-').toLowerCase();
+  const id = `${nsId}-${MENU[currentMenuTitle].children[currentNamespace].length}`;
 
   if (typeof cardOrFunction === 'function') {
     card = cardOrFunction(id);
   }
 
-  CARDS[CURRENT_NAMESPACE].push({
+  MENU[currentMenuTitle].children[currentNamespace].push({
     id,
-    ns: CURRENT_NAMESPACE,
+    ns: currentNamespace,
     fn: () => card,
   });
 }
 
 export function getCards() {
-  return CARDS;
+  return MENU;
+}
+
+export function getNsToMenuMap() {
+  return NS_TO_MENU_MAP;
 }

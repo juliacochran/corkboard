@@ -1,4 +1,4 @@
-import { registerCard, registerNamespace } from './init';
+import { registerCard, registerNamespace, registerGroup } from './init';
 import defcard from './lib/defcard';
 import React from 'react';
 import Markdown from './lib/components/Markdown';
@@ -6,6 +6,7 @@ import Markdown from './lib/components/Markdown';
 export {
   registerNamespace as ns,
   registerCard,
+  registerGroup,
 };
 
 export function card(...args) {
@@ -23,4 +24,8 @@ export function doc(str) {
 
 export function text(documentation) {
   card(null, md([documentation]), null, {}, { heading: false });
+}
+
+export function group(groupName, renderPages) {
+  registerGroup(groupName, renderPages);
 }
