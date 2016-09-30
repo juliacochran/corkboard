@@ -1,37 +1,37 @@
 /* eslint-env browser */
 
 const MENU = [];
-let currentNamespace = null;
-let currentType = null;
-let currentMenuTitle;
 const NS_TO_MENU_MAP = []; /* Keeps a basic mapping of namespace to menu title for easy retrieval */
 
-function menuItem(type, children = []) {
-  return ({
-    type,
-    children,
-  });
+let currentMenuTitle;
+let currentNamespace;
+let currentlyInGroup = false;
+
+function createMenuItem() {
+  return {
+    inGroup: currentlyInGroup,
+    children: [],
+  };
 }
 
 export function registerGroup(groupName, renderPages) {
+  currentlyInGroup = true;
   currentMenuTitle = groupName;
-  currentType = 'group';
-  MENU[currentMenuTitle] = menuItem(currentType);
+  MENU[currentMenuTitle] = createMenuItem();
   renderPages();
-  currentType = null;
+  currentlyInGroup = false;
 }
 
 export function registerNamespace(ns) {
   // namespace already exists
-  if (currentType === 'group' && ns in MENU) {
-    throw new Error('You must have unqiue group names and namespaces');
+  if (currentlyInGroup && ns in MENU) {
+    console.warn(`You already have group named ${ns}! You should name this page something unique.`);
   }
 
   // page without a group
-  if (!currentType) {
+  if (!currentlyInGroup) {
     currentMenuTitle = ns;
-    currentType = 'page';
-    MENU[currentMenuTitle] = menuItem(currentType);
+    MENU[currentMenuTitle] = createMenuItem();
   }
   currentNamespace = ns;
   MENU[currentMenuTitle].children[currentNamespace] = [];
@@ -59,7 +59,7 @@ export function registerCard(cardOrFunction) {
   });
 }
 
-export function getCards() {
+export function getMenu() {
   return MENU;
 }
 
