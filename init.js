@@ -3,66 +3,111 @@
 const MENU = [];
 const NS_TO_MENU_MAP = []; /* Keeps a basic mapping of namespace to menu title for easy retrieval */
 
-let currentMenuTitle;
-let currentNamespace;
-let currentlyInGroup = false;
+const state = {
+  topLevelTitle: null,
+  pageTitle: null,
+  currentlyInGroup: false,
+};
 
-function createMenuItem() {
-  return {
-    inGroup: currentlyInGroup,
+function setState(param, value) {
+  state[param] = value;
+}
+
+function createTopLevelMenuItem(title) {
+  MENU[title] = {
+    inGroup: state.currentlyInGroup,
     children: [],
   };
 }
 
-export function registerGroup(groupName, renderPages) {
-  currentlyInGroup = true;
-  currentMenuTitle = groupName;
-  MENU[currentMenuTitle] = createMenuItem();
-  renderPages();
-  currentlyInGroup = false;
+function generateCardId() {
+  const pageId = state.topLevelTitle.replace(/\W/g, '-').toLowerCase();
+  const id = `${pageId}-${MENU[state.topLevelTitle].children[state.pageTitle].length}`;
+  return id;
 }
 
-export function registerNamespace(ns) {
-  // namespace already exists
-  if (currentlyInGroup && ns in MENU) {
-    console.warn(`You already have group named ${ns}! You should name this page something unique.`);
-  }
+function addGroupToMenu(groupName) {
+  createTopLevelMenuItem(groupName);
+}
 
+function addCardToMenu(card, id) {
+  MENU[state.topLevelTitle].children[state.pageTitle].push({
+    id,
+    fn: () => card,
+  });
+}
+
+function addPageToMenu(title) {
   // page without a group
-  if (!currentlyInGroup) {
-    currentMenuTitle = ns;
-    MENU[currentMenuTitle] = createMenuItem();
+  if (!state.currentlyInGroup) {
+    setState('topLevelTitle', title);
+    createTopLevelMenuItem(title);
   }
-  currentNamespace = ns;
-  MENU[currentMenuTitle].children[currentNamespace] = [];
+  MENU[state.topLevelTitle].children[title] = [];
+  NS_TO_MENU_MAP[title] = state.topLevelTitle;
+}
 
-  NS_TO_MENU_MAP[currentNamespace] = currentMenuTitle;
+ /* external functions used to create menu */
+
+export function registerGroup(groupName, renderPages) {
+  setState('topLevelTitle', groupName);
+  setState('currentlyInGroup', true);
+  addGroupToMenu(groupName);
+  renderPages();
+  setState('currentlyInGroup', false);
+}
+
+
+export function registerPage(title) {
+  setState('pageTitle', title);
+  if (state.currentlyInGroup && title in MENU) {
+    console.warn(`You have a group and page both named ${title}!`);
+  }
+
+  addPageToMenu(title);
 }
 
 export function registerCard(cardOrFunction) {
-  if (!currentMenuTitle) {
+  if (!state.topLevelTitle) {
     throw new Error('No namespace or group defined');
   }
 
   let card = cardOrFunction;
-  const nsId = currentNamespace.replace(/\W/g, '-').toLowerCase();
-  const id = `${nsId}-${MENU[currentMenuTitle].children[currentNamespace].length}`;
-
+  const id = generateCardId();
   if (typeof cardOrFunction === 'function') {
     card = cardOrFunction(id);
   }
 
-  MENU[currentMenuTitle].children[currentNamespace].push({
-    id,
-    ns: currentNamespace,
-    fn: () => card,
-  });
+  addCardToMenu(card, id);
 }
+
+/* Functions to access information about created menu */
 
 export function getMenu() {
   return MENU;
 }
 
-export function getNsToMenuMap() {
-  return NS_TO_MENU_MAP;
+function getTopLevelMenuTitleForPage(pageTitle) {
+  return NS_TO_MENU_MAP[pageTitle];
+}
+
+export function getCardsForPage(pageTitle) {
+  const menuTitle = getTopLevelMenuTitleForPage(pageTitle);
+  return MENU[menuTitle].children[pageTitle];
+}
+
+export function getTopLevelMenuTitles() {
+  return Object.keys(MENU);
+}
+
+export function getPagesForTopLevelMenuTitle(title) {
+  return MENU[title].children;
+}
+
+export function getPageTitlesForTopLevelMenuTitle(title) {
+  return Object.keys(MENU[title].children);
+}
+
+export function isInGroup(topLevelTitle) {
+  return MENU[topLevelTitle].inGroup;
 }
