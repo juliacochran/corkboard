@@ -30,7 +30,7 @@
     "eslint-plugin-jsx-a11y": "^2.2.0",
     "eslint-plugin-react": "^6.2.0",
     "express": "^4.13.3",
-    "jest": "^15.1.1",
+    "jest": "^16.0.0",
     "postcss": "^5.2.4",
     "postcss-cssnext": "^2.5.1",
     "react-addons-test-utils": "^15.1.0",
