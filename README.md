@@ -1,16 +1,5 @@
-## Devcards Example
+# Corkboard
 
-To get started, first clone the repo and open up the examples/ directory:
+[![Build status](https://badge.buildkite.com/85e40937e5afc08c125fe27c8e1b807a21875a0260fd13a153.svg)](https://buildkite.com/pinterest/corkboard)
 
-    $ git clone https://github.com/chrislloyd/devcards.git
-    $ cd devcards/example
-
-Install the necessary dependencies:
-
-    $ npm install
-
-Then, run:
-
-    $ npm run dev
-
-This should open up example usage at `localhost:8080` in your default browser.
+A REPL for React.
