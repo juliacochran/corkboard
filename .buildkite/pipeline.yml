@@ -1,0 +1,3 @@
+steps:
+  - command: npm install && npm test
+    label: ":node:"
